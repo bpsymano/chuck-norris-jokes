@@ -1,0 +1,37 @@
+#%RAML 1.0
+title: Sample API
+#baseUri: http://localhost:8081/
+version: v1
+#######################################################################
+# WHO  WHEN      WHY
+# bs  12-17-2020  intitial commit
+#######################################################################
+
+protocols: [HTTP, HTTPS]
+
+#mediaType: [application/json]
+
+documentation:
+  - title: Sample API
+    content: Sample API for Chuck Norris jokes.
+
+traits:
+  hasCorrelationId: !include ./traits/hasCorrelationId.raml
+  hasClientId: !include ./traits/hasClientId.raml
+
+types:
+  joke: !include dataTypes/joke.raml
+  
+/jokes:
+  /random:
+    displayName: Random Joke
+    description: Get a random Chuck Norris joke
+    is: [hasClientId, hasCorrelationId]
+    get:
+      responses:
+        200:
+          body:
+            application/json:
+              type: joke
+              example: !include examples/joke-response.json
+          

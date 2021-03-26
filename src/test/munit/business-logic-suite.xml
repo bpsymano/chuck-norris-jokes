@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="business-logic-suite.xml" />
+    <munit:test name="get:\jokes\random:Router-test" doc:id="2ac0f4a0-395d-470b-881a-729e0ce8b94a" >
+        <munit:behavior >
+            <munit:set-event doc:name="Set Input" doc:id="99148e7b-6ac6-4b11-b234-9355716f16c6" >
+                <munit:payload value="#[readUrl('classpath://getjokesrandomRoutertest/set-event_payload.dwl')]" encoding="UTF-8" />
+                <munit:attributes value="#[readUrl('classpath://getjokesrandomRoutertest/set-event_attributes.dwl')]" />
+                <munit:variables >
+                    <munit:variable key="outboundHeadersMapName" value="#[readUrl('classpath://getjokesrandomRoutertest/set-event_variable_.dwl')]" />
+                    <munit:variable key="correlation_id" value="#[output application/java --- readUrl('classpath://getjokesrandomRoutertest/set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/java" />
+                </munit:variables>
+            </munit:set-event>
+        </munit:behavior>
+        <munit:execution >
+            <flow-ref doc:name="Flow-ref to get:\jokes\random:Router" doc:id="55da60ba-f39e-464a-81fb-81a8a5950aff" name="get:\jokes\random:Router"/>
+        </munit:execution>
+        <munit:validation >
+            <munit-tools:assert doc:name="Assert payload" doc:id="9ba4e049-84bf-4c5b-aaa1-5b8804f647a0" message="The payload does not match">
+                <munit-tools:that ><![CDATA[#[%dw 2.0
+import getjokesrandomRoutertest::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+            </munit-tools:assert>
+        </munit:validation>
+    </munit:test>
+
+</mule>

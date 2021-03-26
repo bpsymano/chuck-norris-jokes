@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" 
+    xmlns:http="http://www.mulesoft.org/schema/mule/http"
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+    xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+    http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd 
+    http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+    http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+
+
+  <!-- This is the Configuration to make mule always refer to globalErrorHandler defined in error-handling.xml for handling 
+    exceptions -->
+  <configuration defaultErrorHandler-ref="globalErrorHandler" />
+
+  <!-- This Property is to use in various properties and Custom Logger to reference the environment (e.g. local, dev, etc) -->
+  <global-property doc:name="Global Property" name="env" value="local" />
+  <global-property doc:name="Global Property" name="crypto.key" value="password" />
+
+  <!-- This is the configuration to refer and encrypt properties in properties file. -->
+
+  <secure-properties:config name="Secure_Properties_Config" 
+    doc:name="Secure Properties Config"
+    file="properties/chuck-norris-jokes.${env}.properties" 
+    key="${crypto.key}">
+    <secure-properties:encrypt algorithm="Blowfish" />
+  </secure-properties:config>
+
+  <!-- reference artifactId specific properties directory -->
+  <configuration-properties doc:name="Configuration properties"
+    file="properties/chuck-norris-jokes.${env}.properties" />
+
+  <!-- This is the configuration to let this mule app talk to API Manager's corresponding API -->
+  <!-- <api-gateway:autodiscovery apiId="${secure::apiId}" -->
+  <!-- flowRef="mule4-ref-api-project-main" -->
+  <!-- doc:name="API Autodiscovery" /> -->
+
+  <http:request-config name="chuck-norris-request-configuration" 
+    doc:name="Chuck Norris HTTP Request configuration">
+    <http:request-connection protocol="HTTPS" 
+      host="api.chucknorris.io" 
+      port="443" />
+  </http:request-config>
+  
+    <http:listener-config name="https-listener-config" doc:name="HTTP Listener config">
+        <http:listener-connection protocol="HTTPS" host="${http.host}" port="${https.port}">
+            <tls:context>
+                <tls:key-store type="jks" path="security/keystore.jks"
+                    keyPassword="${secure::keystore.password}" password="${secure::keystore.password}"/>
+            </tls:context>
+        </http:listener-connection>
+    </http:listener-config>  
+
+</mule>
